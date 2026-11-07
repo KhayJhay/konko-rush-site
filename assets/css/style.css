@@ -108,7 +108,7 @@ h3 { font-size: clamp(26px, 3vw, 36px); }
 .scroll-cue::after { content: ""; width: 2px; height: 60px; background: linear-gradient(var(--lime), transparent); }
 @media (max-width: 900px) {
   .hero { align-items: flex-end; }
-  .hero-content { align-self: flex-end; padding-top: 0; }
+  .hero-content { align-self: flex-end; padding-top: 96px; }   /* clears the fixed header on short, sideways phones */
   .hero-art { width: 100%; height: 62%; }
   .hero-art img { object-position: 40% 50%; }
   .hero::after { background: linear-gradient(180deg, rgba(10,11,13,0.5) 0%, rgba(10,11,13,0) 18%, rgba(10,11,13,0) 40%, var(--ink) 64%); }
