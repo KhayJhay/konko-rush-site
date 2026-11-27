@@ -1,4 +1,9 @@
-/** GLSL that evaluates where a particle lives on a given delivery form. */
+import { PINNED } from "@/data/game"
+import { toMap } from "@/data/ghana"
+
+/** GLSL that evaluates where a particle lives on a given form. */
+const PIN_GLSL = `const int NPIN = ${PINNED.length};\nconst vec2 PIN[${PINNED.length}] = vec2[${PINNED.length}](${PINNED.map((t) => { const [x, z] = toMap(t.lonlat![0], t.lonlat![1]); return `vec2(${x.toFixed(4)}, ${z.toFixed(4)})` }).join(", ")});`
+
 export const NOISE = /* glsl */ `
 float hash(vec2 p){ p = fract(p*vec2(123.34,456.21)); p += dot(p,p+45.32); return fract(p.x*p.y); }
 float vnoise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*f*(f*(f*6.0-15.0)+10.0);
@@ -6,6 +11,7 @@ float vnoise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 u=f*f*f*(f*(f*6.0-1
 `
 
 export const FORM = /* glsl */ `
+${PIN_GLSL}
 struct Form { int kind; vec4 place; vec4 cam; vec4 p; float size; };
 struct Ev { vec2 px; float z; float a; float s; float tone; float light; };
 
@@ -286,6 +292,21 @@ Ev evalForm(in sampler2D tex, Form F, ivec2 ij, vec4 sd){
     else { e.s = 0.95; e.light *= 0.7; }
   }
 
+  else if(F.kind == 24){                               // Ghana, one pin per circuit
+    int sel = F.p.x < -0.5 ? -1 : int(F.p.x + 0.5);
+    if(g == 1){ e.a = 0.3; e.s = 0.72; }
+    else if(g == 3){ e.a = 0.16; e.s = 0.68; }
+    else if(g >= 10 && g < 10 + NPIN){
+      int i = g - 10; bool on = i == sel; vec3 base = vec3(PIN[i].x, 0.0, PIN[i].y);
+      float grow = on ? 2.1 + 0.1*sin(t*3.0) : 1.0;
+      p = base + (p - base)*vec3(on ? 1.35 : 1.0, grow, on ? 1.35 : 1.0);
+      e.tone = on ? 0.82 : 0.4; e.a = on ? 1.0 : 0.5; e.s = on ? 1.2 : 0.9; e.light *= 0.3;
+    } else if(g >= 20 && g < 20 + NPIN){
+      int i = g - 20; float k = fract(t*0.5 + d.z); float r = 0.025 + k*0.17;
+      p = vec3(PIN[i].x + cos(d.x)*r, 0.003, PIN[i].y + sin(d.x)*r);
+      e.a = i == sel ? (1.0 - k)*0.95 : 0.0; e.tone = 0.82; e.s = 1.0; e.light *= 0.3;
+    }
+  }
   else if(F.kind == 18){                               // a circuit, with six racers on it
     if(g >= 40 && g < 46){ vec4 r = uRacer[g - 40]; p = vec3(r.x + d.x, d.y, r.z + d.z); e.s = g == 40 ? 1.35 : 1.15; e.light = 0.15; }
     else if(g == 5){ float head = fract(t*0.07); float l = exp(-abs(fract(e.tone - head + 0.5) - 0.5)*26.0); e.a = 0.12 + 0.88*l; e.tone = 0.82; e.s = 0.9 + l*0.5; }

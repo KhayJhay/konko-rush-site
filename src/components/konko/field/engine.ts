@@ -221,7 +221,7 @@ export class FieldEngine {
     document.documentElement.addEventListener("pointerleave", this.onUp)
     document.addEventListener("visibilitychange", this.onVis)
     this.canvas.addEventListener("webglcontextlost", this.onLost)
-    this.queue = ["coast", "compound", "podium", "trophy", "item-cap", "item-shield", "item-turbo", "item-repair", "item-shock", "item-deflect", "controller", "flag"]
+    this.queue = ["compound", "coast", "ghana", "podium", "trophy", "item-cap", "item-shield", "item-turbo", "item-repair", "item-shock", "item-deflect", "controller", "flag"]
     this.last = performance.now()
     this.raf = requestAnimationFrame(this.frame)
   }
@@ -325,6 +325,9 @@ export class FieldEngine {
         p = [1, 1, 0.35, clamp(0.7 + Math.abs(this.scrollV) * 0.02, 0.6, 1)]
         break
       }
+      case "ghana":
+        p = [bus.pin, 0, 0, 0]
+        break
       case "carbuild":
         p = [clamp(sp * 1.25, 0, 1), 0, 0, 0]
         break

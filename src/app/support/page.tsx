@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 const FAQ: [string, string][] = [
-  ["Which devices can play KonKo Rush?", "iPhones running iOS 15 or later. Android, Windows and Mac versions are on the way."],
+  ["Which devices can play KonKo Rush?", "iPhones and iPads running iOS 15 or later, and Macs, from the App Store. On Windows, download the game from this site. An Android version is on the way."],
   ["How do I steer on my phone?", "Open Settings and choose Tilt, Tap or TouchDrive. TouchDrive steers for you and keeps you on the road, so you can concentrate on drifting, nitro and items. Auto-accelerate is on by default on phones."],
   ["Can I use a controller?", "Yes. Connect any controller your device supports. Every menu works with the d-pad or stick, and you can change any button in Settings, under Buttons."],
   ["My car is stuck. What do I do?", "Press the reset button (R on a keyboard) to put the car back on the road. With TouchDrive, the car also backs off obstacles by itself."],

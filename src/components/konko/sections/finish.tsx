@@ -1,4 +1,5 @@
 import { Footer } from "../footer"
+import { GetButtons } from "../get-buttons"
 
 export function Finish() {
   return (
@@ -8,13 +9,11 @@ export function Finish() {
       </div>
       <div className="gutter relative z-10 pt-28 lg:pt-[20svh]">
         <h2 className="display-xl max-w-[9ch]">Start your engine.</h2>
-        <p className="mt-6 max-w-[28rem] text-[1.125rem] leading-[1.5]">KonKo Rush is coming soon to the App Store, with Android, Windows and Mac to follow.</p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <span className="cut inline-flex h-12 items-center bg-primary px-7 text-[0.9375rem] font-semibold tracking-[0.03em] text-primary-foreground uppercase">Coming soon to the App Store</span>
-          <a href="/support.html" className="cut inline-flex h-12 items-center bg-foreground/10 px-6 text-[0.9375rem] font-medium tracking-[0.03em] uppercase transition-colors hover:bg-foreground/20">
-            Questions? Visit support
-          </a>
-        </div>
+        <p className="mt-6 max-w-[30rem] text-[1.125rem] leading-[1.5]">KonKo Rush is free on the App Store for iPhone, iPad and Mac, and as a download for Windows. Android is on the way.</p>
+        <GetButtons className="mt-8" />
+        <p className="mt-5 max-w-[30rem] text-[0.9375rem] leading-normal text-muted-foreground">
+          The Windows version comes as a .zip from Google Drive. Questions? <a href="/support.html" className="font-medium text-foreground underline underline-offset-4">Visit support</a>.
+        </p>
       </div>
       <Footer className="relative z-10 mt-auto pt-[46svh] lg:pt-28" />
     </section>

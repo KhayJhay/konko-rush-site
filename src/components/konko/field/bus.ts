@@ -11,6 +11,8 @@ export const bus = {
   joined: 0,
   /** your car's place on the shown lap, 0..1 */
   lap: 0,
+  /** highlighted pin on the Ghana map, -1 for none */
+  pin: -1,
 }
 
 export type Theme = "night" | "day" | "brand"

@@ -4,10 +4,11 @@
  * cool (shield blue) > ink (tin white) > warm (lime) > hot (red) ramp.
  */
 import TRACK_PATHS from "@/data/tracks.json"
-import { ITEMS } from "@/data/game"
+import { ITEMS, PINNED } from "@/data/game"
+import { GHANA_OUTLINE, toMap } from "@/data/ghana"
 
 export type FormId =
-  | "car" | "carbuild" | "coast" | "compound" | "podium" | "trophy" | "controller" | "flag"
+  | "car" | "carbuild" | "coast" | "compound" | "ghana" | "podium" | "trophy" | "controller" | "flag"
   | "item-cap" | "item-shield" | "item-turbo" | "item-repair" | "item-shock" | "item-deflect"
 
 export interface FormSpec {
@@ -31,6 +32,7 @@ export const FORMS: Record<FormId, FormSpec> = {
   carbuild: { kind: 17, cloud: "car", yaw: -0.52, pitch: 0.42, D: 4.6, sway: 0.12, size: 1, halfW: 1.25, halfH: 0.8 },
   coast: { kind: 18, cloud: "coast", yaw: -0.2, pitch: 0.92, D: 5, sway: 0.1, size: 0.98, halfW: 0.95, halfH: 1.02 },
   compound: { kind: 18, cloud: "compound", yaw: -0.2, pitch: 0.92, D: 5, sway: 0.1, size: 0.98, halfW: 1.05, halfH: 1.02 },
+  ghana: { kind: 24, cloud: "ghana", yaw: 0, pitch: 1.12, D: 5, sway: 0.06, size: 1, halfW: 0.78, halfH: 1.02 },
   podium: { kind: 19, cloud: "podium", yaw: 0, pitch: 0.3, D: 4.4, sway: 0.04, size: 1, halfW: 1.3, halfH: 0.9 },
   trophy: { kind: 20, cloud: "trophy", yaw: -0.3, pitch: 0.12, D: 5, sway: 0.5, size: 1, halfW: 0.95, halfH: 1.12 },
   controller: { kind: 22, cloud: "controller", yaw: -0.25, pitch: 0.55, D: 5, sway: 0.25, size: 1, halfW: 1.25, halfH: 0.9 },
@@ -318,6 +320,52 @@ function track(id: string) {
   }
 }
 
+/* ── Ghana, with a pin for every circuit named after a real place ───── */
+
+function ghana(N: number) {
+  reseed(257)
+  const c = new Cloud(N)
+  const P = GHANA_OUTLINE.map(([lon, lat]) => toMap(lon, lat))
+  const inside = (x: number, z: number) => {
+    let o = false
+    for (let i = 0, j = P.length - 1; i < P.length; j = i++) {
+      const [xi, zi] = P[i], [xj, zj] = P[j]
+      if (zi > z !== zj > z && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) o = !o
+    }
+    return o
+  }
+  const L = P.map((p, i) => Math.hypot(P[(i + 1) % P.length][0] - p[0], P[(i + 1) % P.length][1] - p[1]))
+  const tot = L.reduce((s, l) => s + l, 0)
+  c.many(0.3, () => {
+    let d = R() * tot, i = 0
+    while (i < L.length - 1 && d > L[i]) d -= L[i++]
+    const a = P[i], b = P[(i + 1) % P.length], f = d / L[i]
+    c.put(a[0] + (b[0] - a[0]) * f + J(0.004), 0, a[1] + (b[1] - a[1]) * f + J(0.004), 0, 0.4)
+  })
+  c.many(0.34, () => {
+    for (let k = 0; k < 20; k++) {
+      const x = J(0.75), z = J(1.05)
+      if (inside(x, z)) return c.put(x, -0.002, z, 1, 0.3)
+    }
+  })
+  // a one-degree graticule
+  c.many(0.08, () => {
+    if (R() < 0.5) { const lon = -3 + Math.floor(R() * 5); const lat = 4.5 + R() * 7; const [x, z] = toMap(lon, lat); c.put(x, -0.004, z, 3, 0.2) }
+    else { const lat = 5 + Math.floor(R() * 7); const lon = -3.4 + R() * 4.8; const [x, z] = toMap(lon, lat); c.put(x, -0.004, z, 3, 0.2) }
+  })
+  PINNED.forEach((t, i) => {
+    const [px, pz] = toMap(t.lonlat![0], t.lonlat![1])
+    c.many(0.024, () => {
+      const u = R(), a = R() * Math.PI * 2
+      if (u < 0.4) { const y = R() * 0.11; const r = (1 - y / 0.11) * 0.012; c.put(px + Math.cos(a) * r, y, pz + Math.sin(a) * r, 10 + i, 0.4) }
+      else if (u < 0.85) { const b = Math.acos(J(1)); c.put(px + Math.sin(b) * Math.cos(a) * 0.026, 0.13 + Math.cos(b) * 0.026, pz + Math.sin(b) * Math.sin(a) * 0.026, 10 + i, 0.4) }
+      else { const r = 0.03 + J(0.003); c.put(px + Math.cos(a) * r, 0, pz + Math.sin(a) * r, 10 + i, 0.4) }
+    })
+    c.many(0.012, () => c.put(R() * Math.PI * 2, 0, R(), 20 + i, 0.82))
+  })
+  return c.finish()
+}
+
 /* ── garage turntable ────────────────────────────────────────────────── */
 
 function podium(N: number) {
@@ -478,6 +526,7 @@ const CLOUDS: Record<string, (n: number) => Float32Array> = {
   car,
   coast: track("coast"),
   compound: track("compound"),
+  ghana,
   podium,
   trophy,
   controller,

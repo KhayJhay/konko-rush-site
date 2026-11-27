@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next"
 import { Geist_Mono, Inter, Inter_Tight } from "next/font/google"
 
+import { DOWNLOADS } from "@/data/game"
+
 import "./globals.css"
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" })
@@ -9,7 +11,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 const title = "KonKo Rush: race the tin toy cars of Ghana"
 const description =
-  "KonKo Rush is an arcade combat racer starring the handmade tin toy cars of Ghana. Drift, boost, jump and fire items through seafront Accra and a family compound seen from toy height."
+  "KonKo Rush is an arcade combat racer starring the handmade tin toy cars of Ghana. Drift, boost, jump and fire items on seven circuits, from seafront Accra to the Mole savannah. Free on iPhone, iPad, Mac and Windows."
 
 export const metadata: Metadata = {
   title,
@@ -17,6 +19,8 @@ export const metadata: Metadata = {
   icons: { icon: "/assets/img/favicon.png", apple: "/assets/img/icon.png" },
   openGraph: { type: "website", title, description, images: ["/assets/img/keyart.jpg"] },
   twitter: { card: "summary_large_image" },
+  // Safari on iPhone shows an "Open in App Store" banner
+  itunes: { appId: DOWNLOADS.appStoreId },
 }
 
 export const viewport: Viewport = { themeColor: "#0a0b0d" }

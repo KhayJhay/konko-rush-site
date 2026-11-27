@@ -7,6 +7,8 @@ import { Matrix, type Frame } from "@/components/ui/matrix"
 import { VoiceButton } from "@/components/ui/voice-button"
 import { matrixText } from "@/lib/matrix-text"
 
+import { GetButtons } from "../get-buttons"
+
 import { speak, stopVoice, useVoice, type Line } from "../voice"
 
 const CALL: Line[] = [
@@ -96,18 +98,11 @@ export function Hero() {
               Race the tin toy cars of <span className="text-signal italic">Ghana.</span>
             </h1>
             <p className="mt-6 text-[1.0625rem] leading-[1.55] text-muted-foreground max-sm:mt-4 max-sm:text-[0.9375rem]">
-              Konko cars are built by hand from milk tins, sardine cans and bottle caps. In KonKo Rush they drift, boost, jump and fight for the line through Accra.
+              Konko cars are built by hand from milk tins, sardine cans and bottle caps. In KonKo Rush they drift, boost, jump and fight for the line on seven circuits across Ghana.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3 max-sm:mt-5">
-              <a href="#get" className="cut inline-flex h-12 items-center bg-primary px-7 text-[0.9375rem] font-semibold tracking-[0.03em] text-primary-foreground uppercase transition-transform duration-200 hover:translate-x-0.5">
-                Coming soon to the App Store
-              </a>
-              <a href="#garage" className="cut inline-flex h-12 items-center bg-foreground/10 px-6 text-[0.9375rem] font-medium tracking-[0.03em] uppercase transition-colors hover:bg-foreground/20">
-                Meet the cars
-              </a>
-            </div>
-            <ul aria-label="Platforms" className="hud mt-7 flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
-              {["iPhone", "Android", "Windows", "Mac"].map((x, i) => (
+            <GetButtons className="mt-8 max-sm:mt-5" />
+            <ul aria-label="Platforms" className="hud mt-6 flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">
+              {["Free", "iPhone", "iPad", "Mac", "Windows", "Android soon"].map((x, i) => (
                 <li key={x} className={i ? "before:mr-4 before:text-foreground/30 before:content-['/']" : ""}>
                   {x}
                 </li>

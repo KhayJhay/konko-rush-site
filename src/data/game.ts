@@ -12,22 +12,58 @@ export const CARS = [
 ]
 export const STAT_NAMES = ["Speed", "Accel", "Handling", "Nitro"]
 
-export const TRACKS = [
+/** The seven circuits, in the game's own order. Only Compound and Accra Coastal have traced maps and lap facts so far. */
+export interface Circuit {
+  id: string
+  n: string
+  name: string
+  where: string
+  card: string
+  /** traced layout in tracks.json, with lap facts */
+  map?: "compound" | "coast"
+  full?: string
+  shot?: string
+  shotAlt?: string
+  body?: string
+  meta?: [string, string][]
+  /** the real place it is named after */
+  place?: string
+  lonlat?: [number, number]
+  isNew?: boolean
+}
+
+export const TRACKS: Circuit[] = [
   {
-    id: "coast", name: "Accra Coastal Circuit", where: "Greater Accra", shot: "shot_coast_racing", shotAlt: "Racing down the seafront road past palms, painted canoes and shophouses",
-    body: "A seafront road past palms, painted fishing canoes and market stalls, by Jamestown's lighthouse and the Black Star Gate, with a shortcut for the brave.",
-    meta: [["3.1", "km lap"], ["6", "racers"], ["Day", "to dusk"]],
-  },
-  {
-    id: "compound", name: "The Compound Circuit", where: "Family compound", shot: "shot_compound_wall", shotAlt: "A red earth road between stacked bottle-cap barricades, under a giant stool",
+    id: "compound", n: "01", name: "Compound", where: "Family compound", card: "01-compound", map: "compound", full: "The Compound Circuit",
+    shot: "shot_compound_wall", shotAlt: "A red earth road between stacked bottle-cap barricades, under a giant stool",
     body: "Packed red earth at toy height. Stools become archways, washing hangs over the start, and the road runs between walls of stacked bottle caps.",
     meta: [["1.0", "km lap"], ["2", "jumps"], ["Dirt", "loose grip"]],
   },
+  {
+    id: "coast", n: "02", name: "Accra Coastal", where: "Greater Accra", card: "02-accra-coastal", map: "coast", full: "Accra Coastal Circuit", lonlat: [-0.2, 5.55],
+    shot: "shot_coast_racing", shotAlt: "Racing down the seafront road past palms, painted canoes and shophouses",
+    body: "A seafront road past palms, painted fishing canoes and market stalls, by Jamestown's lighthouse and the Black Star Gate, with a shortcut for the brave.",
+    meta: [["3.1", "km lap"], ["6", "racers"], ["Day", "to dusk"]],
+  },
+  { id: "aburi", n: "03", name: "Aburi Gardens", where: "Eastern Region", card: "03-aburi-gardens", place: "Named for the botanical gardens in the Akuapem hills above Accra.", lonlat: [-0.18, 5.85], isNew: true },
+  { id: "capecoast", n: "04", name: "Cape Coast", where: "Central Region", card: "04-cape-coast", place: "Named for the old castle town on the Central Region coast.", lonlat: [-1.25, 5.11], isNew: true },
+  { id: "kakum", n: "05", name: "Kakum Jungle", where: "Central Region", card: "05-kakum-jungle", place: "Named for the Kakum rainforest, inland from Cape Coast.", lonlat: [-1.38, 5.35], isNew: true },
+  { id: "kumasi", n: "06", name: "Kumasi", where: "Ashanti Region", card: "06-kumasi", place: "Named for the Ashanti capital, Ghana's second city.", lonlat: [-1.62, 6.69], isNew: true },
+  { id: "mole", n: "07", name: "Mole Savannah", where: "Savannah Region", card: "07-mole-savannah", place: "Named for Mole National Park, in the savannah of the north.", lonlat: [-1.85, 9.26], isNew: true },
 ]
+
+/** circuits with a real place, in order: these are the pins on the map */
+export const PINNED = TRACKS.filter((t) => t.lonlat)
+
+export const DOWNLOADS = {
+  appStore: "https://apps.apple.com/us/app/konko-rush/id6828086280",
+  appStoreId: "6828086280",
+  windows: "https://drive.google.com/file/d/1F4zMwb7VcE-phar8DWT5l-kFHLbveIo8/view?usp=sharing",
+}
 
 export const MODES = [
   { name: "Quick Race", img: "mode_quickrace", color: "#d4ff3a", body: "First past the line. Pick a circuit, a car and a difficulty, and go." },
-  { name: "Accra Cup", img: "mode_cup", color: "#ff3b24", body: "A four-round championship across both circuits, with points for every place." },
+  { name: "Accra Cup", img: "mode_cup", color: "#ff3b24", body: "A four-round championship, with points for every place." },
   { name: "Knockout", img: "mode_knockout", color: "#ff8a1f", body: "Last place is out. Keep going until one car is left rolling." },
   { name: "Time Trial", img: "mode_timetrial", color: "#4fc3f7", body: "Just you and the clock. No rivals, no items: learn the line and set a record." },
 ]

@@ -1,6 +1,6 @@
 # KonKo Rush site
 
-The game's website: Next.js 16, Tailwind 4, ElevenLabs UI components and a WebGL2 particle field that re-forms per section (the #63 tin formula, both circuits with six racers, the garage turntable, the cup, the six items, a controller and the chequered flag).
+The game's website: Next.js 16, Tailwind 4, ElevenLabs UI components and a WebGL2 particle field that re-forms per section (the #63 tin formula, a picker for all seven circuits with traced maps and a Ghana map of where they are, the garage turntable, the cup, the six items, a controller and the chequered flag).
 
 ```bash
 npm install

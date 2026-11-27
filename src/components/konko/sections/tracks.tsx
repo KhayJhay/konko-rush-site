@@ -1,15 +1,14 @@
 "use client"
 
-import { useInView } from "motion/react"
+import { AnimatePresence, motion, useInView } from "motion/react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { Matrix } from "@/components/ui/matrix"
 import { ScrubBarContainer, ScrubBarThumb, ScrubBarTrack } from "@/components/ui/scrub-bar"
 import { Waveform } from "@/components/ui/waveform"
-import { TRACKS } from "@/data/game"
+import { PINNED, TRACKS } from "@/data/game"
 import PATHS from "@/data/tracks.json"
 import { matrixText } from "@/lib/matrix-text"
-import { cn } from "@/lib/utils"
 
 import { bus } from "../field/bus"
 
@@ -34,24 +33,20 @@ function trace(id: string) {
   return Array.from({ length: 120 }, (_, i) => 0.18 + 0.8 * (1 - Math.min(1, raw[Math.floor((i / 120) * M)] / max) ** 0.6))
 }
 
-export function Tracks() {
-  const ref = useRef<HTMLElement>(null)
-  const inView = useInView(ref, { amount: 0.5 })
-  const [i, setI] = useState(0)
+/** A lap you can scrub: dot-matrix distance and speed bars traced from the circuit's own corners. */
+function Lap({ map, km }: { map: "compound" | "coast"; km: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { amount: 0.6 })
   const [lap, setLap] = useState(0.08)
   const [held, setHeld] = useState(false)
   const at = useRef(lap)
-  const t = TRACKS[i]
-  const km = parseFloat(t.meta[0][0])
-  const data = useMemo(() => trace(t.id), [t.id])
-
+  const data = useMemo(() => trace(map), [map])
   const go = useCallback((v: number) => {
     const x = ((v % 1) + 1) % 1
     at.current = x
     bus.lap = x
     setLap(x)
   }, [])
-
   useEffect(() => {
     if (!inView || held || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
     let raf = 0
@@ -64,80 +59,156 @@ export function Tracks() {
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
   }, [inView, held, go])
-
   const dist = matrixText((lap * km).toFixed(1))
+  return (
+    <div ref={ref} className="mt-6 flex items-end gap-5">
+      <div className="shrink-0 text-signal">
+        <Matrix rows={7} cols={dist.cols} pattern={dist.frame} size={3.8} gap={1.4} ariaLabel={`${(lap * km).toFixed(1)} km into the lap`} palette={{ on: "var(--signal)", off: "var(--muted-foreground)" }} />
+        <p className="hud mt-2 text-muted-foreground">km in</p>
+      </div>
+      <ScrubBarContainer duration={1} value={lap} onScrub={(v) => go(Math.min(0.999, v))} onScrubStart={() => setHeld(true)} className="relative block h-14 flex-1">
+        <Waveform key={map} data={data} height={56} barWidth={3} barGap={3} barRadius={2} fadeEdges={false} barColor="#f4f4f2" className="pointer-events-none absolute inset-0 opacity-30" />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - lap * 100}% 0 0)` }}>
+          <Waveform key={`lit-${map}`} data={data} height={56} barWidth={3} barGap={3} barRadius={2} fadeEdges={false} barColor="#d4ff3a" />
+        </div>
+        <ScrubBarTrack
+          tabIndex={0}
+          aria-label="Your car's place on the lap. Bars show speed: tall on the straights, short through the corners."
+          aria-valuetext={`${(lap * km).toFixed(1)} of ${km} km`}
+          onKeyDown={(e) => {
+            const d = { ArrowRight: 0.01, ArrowUp: 0.01, ArrowLeft: -0.01, ArrowDown: -0.01 }[e.key]
+            if (d) {
+              e.preventDefault()
+              setHeld(true)
+              go(at.current + d)
+            }
+          }}
+          className="absolute inset-0 h-full cursor-ew-resize rounded-none bg-transparent"
+        >
+          <span aria-hidden="true" className="absolute inset-y-0 w-px bg-foreground" style={{ left: `${lap * 100}%` }} />
+          <ScrubBarThumb className="size-4 border-4 border-background bg-signal" />
+        </ScrubBarTrack>
+      </ScrubBarContainer>
+    </div>
+  )
+}
+
+/** The game's own "Choose a circuit" screen: seven cards, A / D to change. */
+export function Tracks() {
+  const ref = useRef<HTMLElement>(null)
+  const strip = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { amount: 0.45 })
+  const [i, setI] = useState(0)
+  const t = TRACKS[i]
+
+  const pick = useCallback((k: number, focus = false) => {
+    const n = (k + TRACKS.length) % TRACKS.length
+    setI(n)
+    const el = strip.current?.children[n] as HTMLElement | undefined
+    el?.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" })
+    if (focus) el?.focus()
+  }, [])
+
+  useEffect(() => {
+    bus.pin = t.lonlat ? PINNED.indexOf(t) : -1
+  }, [t])
+
+  // A / D change circuit while the section is on screen, as in the game
+  useEffect(() => {
+    if (!inView) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || (e.target as HTMLElement)?.closest("input, textarea, select")) return
+      const k = e.key.toLowerCase()
+      if (k === "a" || k === "d") pick(i + (k === "d" ? 1 : -1))
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [inView, i, pick])
 
   return (
     <section ref={ref} id="tracks" data-scene="tracks" data-label="Circuits" data-theme="night" className="relative flex min-h-svh flex-col overflow-clip">
-      <div data-field={t.id} aria-hidden="true" className="max-lg:order-2 max-lg:h-[46svh] lg:absolute lg:inset-y-[10svh] lg:right-[3vw] lg:left-[46vw]" />
+      <div data-field={t.map ?? "ghana"} aria-hidden="true" className="max-lg:order-2 max-lg:h-[42svh] lg:absolute lg:top-[9svh] lg:right-[3vw] lg:bottom-[33svh] lg:left-[47vw]" />
 
-      <div className="gutter relative z-10 grid gap-x-10 gap-y-6 pt-24 max-lg:order-1 lg:w-[50%] lg:pt-28">
+      <div className="gutter relative z-10 pt-24 max-lg:order-1 lg:w-[50%] lg:pt-28">
         <div data-veil>
-          <h2 className="display-lg">The circuits</h2>
-          <p className="mt-5 max-w-[30rem] text-[1.0625rem] leading-[1.55] text-muted-foreground">
-            One road runs full size along the Accra coast. The other runs through a family compound, seen from the height of a toy.
+          <h2 className="display-lg">Seven circuits</h2>
+          <p className="mt-4 max-w-[30rem] text-[1.0625rem] leading-[1.55] text-muted-foreground">
+            From a family compound seen at toy height to the Accra coast, Kumasi and the Mole savannah.
           </p>
-          <div role="tablist" aria-label="Circuit" className="mt-7 flex gap-1.5">
-            {TRACKS.map((x, k) => (
-              <button
-                key={x.id}
-                role="tab"
-                aria-selected={k === i}
-                onClick={() => setI(k)}
-                className={cn("cut h-10 cursor-pointer px-4 text-sm font-medium uppercase tracking-[0.04em] transition-colors", k === i ? "bg-primary text-primary-foreground" : "bg-foreground/8 text-muted-foreground hover:text-foreground")}
-              >
-                {x.where}
-              </button>
-            ))}
-          </div>
-          <div role="tabpanel" aria-label={t.name} className="mt-6">
-            <h3 className="font-display text-[1.75rem] font-light tracking-[-0.02em]">{t.name}</h3>
-            <p className="mt-2 max-w-[30rem] text-[0.9375rem] leading-normal text-muted-foreground">{t.body}</p>
-            <dl className="mt-5 flex gap-8">
-              {t.meta.map(([v, k]) => (
-                <div key={k}>
-                  <dd className="font-display text-2xl font-light">{v}</dd>
-                  <dt className="hud mt-0.5 text-muted-foreground">{k}</dt>
-                </div>
-              ))}
-            </dl>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`/assets/img/${t.shot}.jpg`} alt={t.shotAlt} width={1400} height={788} loading="lazy" className="cut mt-6 aspect-video w-full max-w-[26rem] object-cover" />
-          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={t.id}
+              role="tabpanel"
+              id="circuit-panel"
+              aria-labelledby={`circuit-${t.id}`}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -16 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              className="mt-7 min-h-[11rem]"
+            >
+              <p className="hud flex items-center gap-2 text-muted-foreground">
+                <span className="text-signal">{t.n}</span> {t.where}
+                {t.isNew && <span className="bg-primary px-1.5 py-0.5 text-primary-foreground">New</span>}
+              </p>
+              <h3 className="mt-2 font-display text-[clamp(1.75rem,3vw,2.375rem)] leading-tight font-light tracking-[-0.025em]">{t.full ?? t.name}</h3>
+              <p className="mt-2 max-w-[30rem] text-[0.9375rem] leading-normal text-muted-foreground">{t.body ?? t.place}</p>
+              {t.meta && (
+                <dl className="mt-4 flex gap-8">
+                  {t.meta.map(([v, k]) => (
+                    <div key={k} className="flex flex-col-reverse">
+                      <dt className="hud mt-0.5 text-muted-foreground">{k}</dt>
+                      <dd className="font-display text-2xl font-light">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+              {t.map && t.meta && <Lap map={t.map} km={parseFloat(t.meta[0][0])} />}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
 
-      <div className="gutter relative z-10 mt-auto pt-6 pb-28 max-lg:order-3">
-        <div className="flex items-end gap-6">
-          <div className="shrink-0 text-signal">
-            <Matrix rows={7} cols={dist.cols} pattern={dist.frame} size={4.6} gap={1.6} ariaLabel={`${(lap * km).toFixed(1)} km into the lap`} palette={{ on: "var(--signal)", off: "var(--muted-foreground)" }} />
-            <p className="hud mt-2 text-muted-foreground">km into the lap</p>
-          </div>
-          <ScrubBarContainer duration={1} value={lap} onScrub={(v) => go(Math.min(0.999, v))} onScrubStart={() => setHeld(true)} className="relative block h-20 flex-1">
-            <Waveform key={t.id} data={data} height={80} barWidth={3} barGap={3} barRadius={2} fadeEdges={false} barColor="#f4f4f2" className="pointer-events-none absolute inset-0 opacity-30" />
-            <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - lap * 100}% 0 0)` }}>
-              <Waveform key={`lit-${t.id}`} data={data} height={80} barWidth={3} barGap={3} barRadius={2} fadeEdges={false} barColor="#d4ff3a" />
-            </div>
-            <ScrubBarTrack
-              tabIndex={0}
-              aria-label="Your car's place on the lap"
-              aria-valuetext={`${(lap * km).toFixed(1)} of ${km} km`}
+      <div className="gutter relative z-10 mt-auto pt-8 pb-28 max-lg:order-3">
+        <p className="hud mb-3 text-muted-foreground" id="choose-circuit">
+          Choose a circuit
+        </p>
+        <div ref={strip} role="tablist" aria-labelledby="choose-circuit" className="-mx-1 grid snap-x auto-cols-[minmax(9.5rem,1fr)] grid-flow-col gap-2.5 overflow-x-auto px-1 pt-1 pb-2 [scrollbar-width:none]">
+          {TRACKS.map((c, k) => (
+            <button
+              key={c.id}
+              id={`circuit-${c.id}`}
+              type="button"
+              role="tab"
+              aria-selected={k === i}
+              aria-controls="circuit-panel"
+              tabIndex={k === i ? 0 : -1}
+              onClick={() => pick(k)}
               onKeyDown={(e) => {
-                const d = { ArrowRight: 0.01, ArrowUp: 0.01, ArrowLeft: -0.01, ArrowDown: -0.01 }[e.key]
-                if (d) {
-                  e.preventDefault()
-                  setHeld(true)
-                  go(at.current + d)
-                }
+                const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0
+                if (!d) return
+                e.preventDefault()
+                pick(k + d, true)
               }}
-              className="absolute inset-0 h-full cursor-ew-resize rounded-none bg-transparent"
+              className="group cut snap-start cursor-pointer text-left outline-none transition-transform duration-300 ease-out-expo hover:-translate-y-0.5 focus-visible:-translate-y-0.5 aria-selected:-translate-y-1"
             >
-              <span aria-hidden="true" className="absolute inset-y-0 w-px bg-foreground" style={{ left: `${lap * 100}%` }} />
-              <ScrubBarThumb className="size-4 border-4 border-background bg-signal" />
-            </ScrubBarTrack>
-          </ScrubBarContainer>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={`/assets/img/circuits/${c.card}.jpg`} alt="" width={243} height={127} loading="lazy" className="aspect-[243/127] w-full object-cover opacity-60 transition-opacity group-hover:opacity-90 group-aria-selected:opacity-100" />
+              <span className="flex items-center justify-between gap-2 bg-foreground/8 px-3 py-2.5 text-[0.8125rem] font-semibold tracking-[0.05em] uppercase transition-colors group-focus-visible:bg-foreground/20 group-aria-selected:bg-primary group-aria-selected:text-primary-foreground">
+                <span className="truncate">{c.name}</span>
+                {c.isNew && <span className="hud shrink-0 text-[0.625rem] text-signal group-aria-selected:text-primary-foreground">New</span>}
+              </span>
+            </button>
+          ))}
         </div>
-        <p className="hud mt-3 text-muted-foreground">Bars show speed: tall on the straights, short through the corners. Drag to move your car.</p>
+        <p className="hud mt-3 flex gap-5 text-muted-foreground max-lg:hidden" aria-hidden="true">
+          <span>
+            <kbd className="mr-2 rounded-md border border-b-[3px] border-foreground/25 bg-background px-2 py-0.5 text-foreground">A / D</kbd>Change
+          </span>
+          <span>
+            <kbd className="mr-2 rounded-md border border-b-[3px] border-foreground/25 bg-background px-2 py-0.5 text-foreground">Click</kbd>Select
+          </span>
+        </p>
       </div>
     </section>
   )
