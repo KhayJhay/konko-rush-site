@@ -1,0 +1,11 @@
+.git
+.next
+out
+node_modules
+.legacy
+.claude
+.codex
+.cursor
+.gemini
+.impeccable
+*.tsbuildinfo
