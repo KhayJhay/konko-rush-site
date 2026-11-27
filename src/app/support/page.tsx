@@ -4,6 +4,8 @@ import { PageShell } from "@/components/konko/page-shell"
 import { EMAIL } from "@/data/game"
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/support.html" },
+  openGraph: { url: "/support.html", images: ["/assets/img/keyart.jpg"] },
   title: "Support | KonKo Rush",
   description: "Help with KonKo Rush: controls, progress, online races and how to contact us.",
 }
@@ -16,7 +18,7 @@ const FAQ: [string, string][] = [
   ["How do I unlock more cars?", "Earn credits by racing and meet each tier's goal, such as winning three races or winning the Accra Cup. Cars can't be bought with real money."],
   ["Is my progress saved?", "Progress and settings are saved on your device. Deleting the app deletes them too, and they don't move to a new device yet."],
   ["How do online races work?", "Online races with friends are still being tested. When they're ready, one player makes a room and shares its code, and friends join with that code."],
-  ["Does the game have ads or purchases?", "No. KonKo Rush currently has no ads and no in-app purchases."],
+  ["Does the game have ads or purchases?", "KonKo Rush is free and shows ads: an optional video you can choose to watch for extra credits, and an occasional full-screen ad between races. There are no in-app purchases. You can turn off personalised ads in Settings, under Gameplay."],
   ["The game looks wrong or runs slowly", "Try a lower quality in Settings, under Graphics, and close other apps. If the problem stays, email us with your device model."],
 ]
 

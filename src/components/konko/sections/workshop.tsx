@@ -12,7 +12,7 @@ const TEXT =
 const STATS: [string, string][] = [
   ["8", "Cars to earn"],
   ["5", "Car tiers"],
-  ["7", "Circuits"],
+  ["8", "Circuits"],
   ["6", "Items"],
 ]
 

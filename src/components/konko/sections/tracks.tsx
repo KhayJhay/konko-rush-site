@@ -131,9 +131,9 @@ export function Tracks() {
 
       <div className="gutter relative z-10 pt-24 max-lg:order-1 lg:w-[50%] lg:pt-28">
         <div data-veil>
-          <h2 className="display-lg">Seven circuits</h2>
+          <h2 className="display-lg">Eight circuits</h2>
           <p className="mt-4 max-w-[30rem] text-[1.0625rem] leading-[1.55] text-muted-foreground">
-            From a family compound seen at toy height to the Accra coast, Kumasi and the Mole savannah.
+            From the Accra coast to the Mole savannah, every road is based on a real Ghanaian place. One even runs through a family compound, seen from the height of a toy.
           </p>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -192,11 +192,17 @@ export function Tracks() {
               }}
               className="group cut snap-start cursor-pointer text-left outline-none transition-transform duration-300 ease-out-expo hover:-translate-y-0.5 focus-visible:-translate-y-0.5 aria-selected:-translate-y-1"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`/assets/img/circuits/${c.card}.jpg`} alt="" width={243} height={127} loading="lazy" className="aspect-[243/127] w-full object-cover opacity-60 transition-opacity group-hover:opacity-90 group-aria-selected:opacity-100" />
+              {c.card ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={`/assets/img/circuits/${c.card}.jpg`} alt="" width={243} height={127} loading="lazy" className="aspect-[243/127] w-full object-cover opacity-60 transition-opacity group-hover:opacity-90 group-aria-selected:opacity-100" />
+              ) : (
+                <span className="flex aspect-[243/127] w-full flex-col justify-between bg-[repeating-linear-gradient(135deg,var(--card)_0_14px,var(--secondary)_14px_28px)] p-3 opacity-70 transition-opacity group-hover:opacity-90 group-aria-selected:opacity-100">
+                  <span className="font-display text-[1.75rem] leading-none font-semibold italic">{c.n}</span>
+                  <span className="hud text-muted-foreground">Career</span>
+                </span>
+              )}
               <span className="flex items-center justify-between gap-2 bg-foreground/8 px-3 py-2.5 text-[0.8125rem] font-semibold tracking-[0.05em] uppercase transition-colors group-focus-visible:bg-foreground/20 group-aria-selected:bg-primary group-aria-selected:text-primary-foreground">
                 <span className="truncate">{c.name}</span>
-                {c.isNew && <span className="hud shrink-0 text-[0.625rem] text-signal group-aria-selected:text-primary-foreground">New</span>}
               </span>
             </button>
           ))}

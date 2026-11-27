@@ -98,7 +98,7 @@ export function Hero() {
               Race the tin toy cars of <span className="text-signal italic">Ghana.</span>
             </h1>
             <p className="mt-6 text-[1.0625rem] leading-[1.55] text-muted-foreground max-sm:mt-4 max-sm:text-[0.9375rem]">
-              Konko cars are built by hand from milk tins, sardine cans and bottle caps. In KonKo Rush they drift, boost, jump and fight for the line on seven circuits across Ghana.
+              Konko cars are built by hand from milk tins, sardine cans and bottle caps. In KonKo Rush they drift, boost, jump and fight for the line on eight circuits across Ghana.
             </p>
             <GetButtons className="mt-8 max-sm:mt-5" />
             <ul aria-label="Platforms" className="hud mt-6 flex flex-wrap gap-x-4 gap-y-1 text-muted-foreground">

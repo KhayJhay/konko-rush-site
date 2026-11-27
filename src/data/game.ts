@@ -12,13 +12,14 @@ export const CARS = [
 ]
 export const STAT_NAMES = ["Speed", "Accel", "Handling", "Nitro"]
 
-/** The seven circuits, in the game's own order. Only Compound and Accra Coastal have traced maps and lap facts so far. */
+/** The eight circuits: the game's seven-card menu order, then Circle, raced in the career. Only Compound and Accra Coastal have traced maps and lap facts so far. */
 export interface Circuit {
   id: string
   n: string
   name: string
   where: string
-  card: string
+  /** menu art; Circle has none yet */
+  card?: string
   /** traced layout in tracks.json, with lap facts */
   map?: "compound" | "coast"
   full?: string
@@ -45,18 +46,21 @@ export const TRACKS: Circuit[] = [
     body: "A seafront road past palms, painted fishing canoes and market stalls, by Jamestown's lighthouse and the Black Star Gate, with a shortcut for the brave.",
     meta: [["3.1", "km lap"], ["6", "racers"], ["Day", "to dusk"]],
   },
-  { id: "aburi", n: "03", name: "Aburi Gardens", where: "Eastern Region", card: "03-aburi-gardens", place: "Named for the botanical gardens in the Akuapem hills above Accra.", lonlat: [-0.18, 5.85], isNew: true },
-  { id: "capecoast", n: "04", name: "Cape Coast", where: "Central Region", card: "04-cape-coast", place: "Named for the old castle town on the Central Region coast.", lonlat: [-1.25, 5.11], isNew: true },
-  { id: "kakum", n: "05", name: "Kakum Jungle", where: "Central Region", card: "05-kakum-jungle", place: "Named for the Kakum rainforest, inland from Cape Coast.", lonlat: [-1.38, 5.35], isNew: true },
-  { id: "kumasi", n: "06", name: "Kumasi", where: "Ashanti Region", card: "06-kumasi", place: "Named for the Ashanti capital, Ghana's second city.", lonlat: [-1.62, 6.69], isNew: true },
-  { id: "mole", n: "07", name: "Mole Savannah", where: "Savannah Region", card: "07-mole-savannah", place: "Named for Mole National Park, in the savannah of the north.", lonlat: [-1.85, 9.26], isNew: true },
+  { id: "aburi", n: "03", name: "Aburi Gardens", where: "Eastern Region", card: "03-aburi-gardens", place: "Hill roads through gardens and forest above the capital.", lonlat: [-0.18, 5.85], isNew: true },
+  { id: "capecoast", n: "04", name: "Cape Coast", where: "Central Region", card: "04-cape-coast", place: "Castle walls and the Atlantic shore.", lonlat: [-1.25, 5.11], isNew: true },
+  { id: "kakum", n: "05", name: "Kakum Jungle", full: "Kakum Jungle Run", where: "Central Region", card: "05-kakum-jungle", place: "A jungle run under the canopy walkway.", lonlat: [-1.38, 5.35], isNew: true },
+  { id: "kumasi", n: "06", name: "Kumasi", where: "Ashanti Region", card: "06-kumasi", place: "Busy streets and market stalls in the Garden City.", lonlat: [-1.62, 6.69], isNew: true },
+  { id: "mole", n: "07", name: "Mole Savannah", where: "Savannah Region", card: "07-mole-savannah", place: "Open savannah roads in the north.", lonlat: [-1.85, 9.26], isNew: true },
+  { id: "circle", n: "08", name: "Circle", where: "Greater Accra", place: "A fast city loop round Kwame Nkrumah Circle, under the flyover. Raced in the career.", lonlat: [-0.217, 5.571], isNew: true },
 ]
 
 /** circuits with a real place, in order: these are the pins on the map */
 export const PINNED = TRACKS.filter((t) => t.lonlat)
 
+export const SITE = "https://play.konkorush.com"
+
 export const DOWNLOADS = {
-  appStore: "https://apps.apple.com/us/app/konko-rush/id6828086280",
+  appStore: "https://apps.apple.com/app/konko-rush/id6828086280",
   appStoreId: "6828086280",
   windows: "https://drive.google.com/file/d/1F4zMwb7VcE-phar8DWT5l-kFHLbveIo8/view?usp=sharing",
 }
