@@ -2,3 +2,12 @@
 .codex/
 .cursor/
 .gemini/
+.legacy/
+.claude/
+
+/node_modules
+/.next/
+/out/
+*.tsbuildinfo
+next-env.d.ts
+.env*

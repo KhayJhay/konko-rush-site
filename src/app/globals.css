@@ -1,0 +1,188 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Registered so a theme change cross-fades every token at once. */
+@property --background { syntax: "<color>"; inherits: true; initial-value: #0a0b0d; }
+@property --foreground { syntax: "<color>"; inherits: true; initial-value: #f4f4f2; }
+@property --muted-foreground { syntax: "<color>"; inherits: true; initial-value: #9ba0a8; }
+@property --border { syntax: "<color>"; inherits: true; initial-value: #24272c; }
+@property --card { syntax: "<color>"; inherits: true; initial-value: #121417; }
+@property --secondary { syntax: "<color>"; inherits: true; initial-value: #1c1f23; }
+@property --primary { syntax: "<color>"; inherits: true; initial-value: #d4ff3a; }
+@property --primary-foreground { syntax: "<color>"; inherits: true; initial-value: #0a0b0d; }
+@property --signal { syntax: "<color>"; inherits: true; initial-value: #d4ff3a; }
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-signal: var(--signal);
+  --font-sans: var(--font-inter), "Inter", "Helvetica Neue", Arial, sans-serif;
+  /* Waldenburg is the licensed ElevenLabs display face; it takes over if you install it. */
+  --font-display: "Waldenburg", var(--font-inter-tight), "Inter Tight", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, Menlo, monospace;
+  --font-heading: var(--font-display);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* The game's own interface: near-black ink, tin white, acid lime for anything you can press. */
+:root,
+[data-theme="night"] {
+  color-scheme: dark;
+  --radius: 0.625rem;
+  --background: #0a0b0d;
+  --foreground: #f4f4f2;
+  --muted-foreground: #9ba0a8;
+  --border: #24272c;
+  --card: #121417;
+  --secondary: #1c1f23;
+  --primary: #d4ff3a;
+  --primary-foreground: #0a0b0d;
+  --signal: #d4ff3a;
+  --muted: var(--secondary);
+  --accent: var(--secondary);
+  --accent-foreground: var(--foreground);
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --secondary-foreground: var(--foreground);
+  --input: var(--border);
+  --ring: var(--signal);
+  --destructive: #ff5a46;
+}
+
+/* tin: the printed sheet before it is bent into a car */
+[data-theme="day"] {
+  color-scheme: light;
+  --background: #f1f0ea;
+  --foreground: #0a0b0d;
+  --muted-foreground: #565a61;
+  --border: #d6d4cb;
+  --card: #e6e5de;
+  --secondary: #dddbd2;
+  --primary: #0a0b0d;
+  --primary-foreground: #d4ff3a;
+  --signal: #4a6200;
+  --destructive: #b4200d;
+}
+
+/* acid lime, for the finish */
+[data-theme="brand"] {
+  color-scheme: light;
+  --background: #d4ff3a;
+  --foreground: #0a0b0d;
+  --muted-foreground: #3b4708;
+  --border: #a5c61f;
+  --card: #c9f52c;
+  --secondary: #bfe82a;
+  --primary: #0a0b0d;
+  --primary-foreground: #d4ff3a;
+  --signal: #0a0b0d;
+  --destructive: #8a1206;
+}
+
+@layer base {
+  * { @apply border-border; }
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+    scrollbar-color: color-mix(in srgb, var(--foreground) 28%, transparent) transparent;
+    transition: --background 0.8s var(--ease-out-expo), --foreground 0.5s ease, --muted-foreground 0.5s ease, --border 0.6s ease,
+      --card 0.6s ease, --secondary 0.6s ease, --primary 0.5s ease, --primary-foreground 0.5s ease, --signal 0.5s ease;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 1rem;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    overflow-x: clip;
+  }
+  ::selection { background: var(--signal); color: var(--background); }
+  a, button, input, select { caret-color: var(--signal); }
+  :focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 300; text-wrap: balance; }
+}
+
+@utility display-xl {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(3rem, min(7.4vw, 13svh), 6rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+@utility display-lg {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.375rem, min(5.2vw, 9svh), 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.032em;
+}
+@utility display-md {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(1.75rem, min(3.3vw, 6svh), 3rem);
+  line-height: 1.14;
+  letter-spacing: -0.022em;
+}
+@utility gutter { padding-inline: clamp(1.25rem, 4.4vw, 4rem); }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; transition: none; }
+}
+
+@keyframes dwell {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes fold-open {
+  from { height: 0; opacity: 0; }
+  to { height: var(--radix-accordion-content-height); opacity: 1; }
+}
+@keyframes fold-shut {
+  from { height: var(--radix-accordion-content-height); opacity: 1; }
+  to { height: 0; opacity: 0; }
+}
+
+/* Matrix dots settle fast enough to keep up with the odometer and the scrubber. */
+.matrix-pixel.matrix-pixel { transition-duration: 110ms; }
+
+/* game cuts: slanted ends on anything you press, like the in-game buttons */
+@utility cut {
+  clip-path: polygon(0.75rem 0, 100% 0, calc(100% - 0.75rem) 100%, 0 100%);
+}
+@utility hud {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+@keyframes speedlines {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
