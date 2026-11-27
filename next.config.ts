@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   output: "export",
   images: { unoptimized: true },
   devIndicators: false,
+  ...(process.env.NODE_ENV === "development"
+    ? { rewrites: async () => [{ source: "/:page(support|privacy).html", destination: "/:page" }] }
+    : {}),
   turbopack: {
     rules: {
       "*.css": {

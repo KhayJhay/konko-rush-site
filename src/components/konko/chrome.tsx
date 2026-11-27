@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { ArrowUp } from "lucide-react"
 import { useMotionValueEvent, useScroll } from "motion/react"
+import { usePathname } from "next/navigation"
 import { useMemo, useRef, useState } from "react"
 
 import { Matrix } from "@/components/ui/matrix"
@@ -15,6 +16,7 @@ import { Brand } from "./brand"
 import { useScene } from "./field/bus"
 
 export function Nav({ home = true }: { home?: boolean }) {
+  const path = usePathname()
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-40 before:absolute before:inset-x-0 before:top-0 before:-z-10 before:h-28 before:bg-linear-to-b before:from-background before:from-35% before:via-background/80 before:via-65% before:to-transparent before:content-['']">
       <div className="gutter flex h-[4.5rem] items-center justify-between">
@@ -23,7 +25,12 @@ export function Nav({ home = true }: { home?: boolean }) {
         </Link>
         <nav aria-label="Main" className="pointer-events-auto flex items-center gap-1 text-[0.9375rem]">
           {NAV.map(({ href, label }) => (
-            <a key={href} href={href} className={cn("rounded-full px-3.5 py-2 text-foreground/80 transition-colors hover:text-foreground", label === "Support" ? "max-sm:px-2" : "hidden lg:block")}>
+            <a
+              key={href}
+              href={href}
+              aria-current={href.endsWith(".html") && path?.startsWith(href.replace(".html", "")) ? "page" : undefined}
+              className={cn("rounded-full px-3.5 py-2 text-foreground/80 transition-colors hover:text-foreground aria-[current=page]:text-signal", label === "Support" ? "max-sm:px-2" : "hidden lg:block")}
+            >
               {label}
             </a>
           ))}

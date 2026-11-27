@@ -22,13 +22,20 @@ const FAQ: [string, string][] = [
 
 export default function Support() {
   return (
-    <PageShell title="Support" lead="Answers to common questions, and how to reach us.">
-      <div className="cut bg-card px-7 py-6">
-        <p className="font-display text-[1.5rem] font-light">Contact us</p>
-        <p className="!mt-2">
-          Email <a href={`mailto:${EMAIL}`}>{EMAIL}</a>. Tell us your device, the game version (shown on the title screen) and what happened.
-        </p>
-      </div>
+    <PageShell
+      title="Support"
+      lead="Answers to common questions, and how to reach us."
+      aside={
+        <section aria-labelledby="contact" className="cut bg-card py-6 pr-8 pl-9 [&_a]:text-signal [&_a]:underline [&_a]:underline-offset-4">
+          <h2 id="contact" className="font-display text-[1.5rem] font-light tracking-[-0.02em]">
+            Contact us
+          </h2>
+          <p className="mt-2 text-[1.0625rem] leading-[1.6]">
+            Email <a href={`mailto:${EMAIL}`}>{EMAIL}</a>. Tell us your device, the game version (shown on the title screen) and what happened.
+          </p>
+        </section>
+      }
+    >
       <h2>Common questions</h2>
       <div className="border-b">
         {FAQ.map(([q, a]) => (
